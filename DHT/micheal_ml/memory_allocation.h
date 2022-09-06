@@ -75,13 +75,13 @@ class memory_pool
 			active_queue->push(t);
 			t = nullptr;
 		    }
-		    free_nodes.store(0);
 		  
 		    if(active_queue->pop(n)) break;  
 
 		    node_type *chunk = (node_type*)std::malloc(chunk_size*sizeof(node_type));
 		    assert (chunk != nullptr);
 		    num_chunks.fetch_add(1);
+
 		    for(uint32_t i=0;i<chunk_size;i++)
 		    {
 			new (&(chunk[i].key)) KeyT();
