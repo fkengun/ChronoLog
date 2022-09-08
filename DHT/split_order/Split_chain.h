@@ -13,8 +13,9 @@
 #include <boost/thread/shared_mutex.hpp>
 #include "memory_allocation.h"
 #include "node.h"
+#include <bitset>
 
-#define MAX_COLLISIONS 20
+#define MAX_COLLISIONS 40
 #define MAX_TABLE_SIZE 0.8*ntables*table_size*MAX_COLLISIONS
 
 #define LOCK_TABLE(t_no,index) \
@@ -58,9 +59,8 @@ class split_map
 		node_type *list;
 		memory_pool<KeyT,ValueT,HashFcn,EqualFcn> *pl;
 		std::atomic<uint32_t> num_bits;
-		std::atomic<uint32_t> allocated;
-		std::atomic<uint32_t> removed;
-		std::atomic<uint32_t> full;
+		std::atomic<uint64_t> allocated;
+		std::atomic<uint64_t> removed;
 	public :
 		uint64_t next_power_two(uint64_t n)
 		{
@@ -117,33 +117,34 @@ class split_map
 			     n = n->next;
 		     }
 		     num_tables.store(1);
-		     num_bits.store(log2(table_size));
 		     max_load = 0;
-		     allocated.store(0); removed.store(0); full.store(0);
+		     allocated.store(0); removed.store(0);
 		}
 		~split_map()
 		{
+		   std::cout <<" num_tables = "<<num_tables.load()<<" table_size = "<<table_size<<std::endl;
 		   for(int i=0;i<num_tables.load();i++)
 			   delete tables[i];
 		}
 
-		void recursive_fill(uint64_t table_no,uint64_t index)
+		void recursive_fill(uint64_t table_no,uint64_t index_p,uint32_t level)
 		{
-		   uint64_t pos = table_no*table_size+index;
-		   uint64_t parent = (table_no-1)*table_size+index;
-		   uint64_t p_table_no = table_no-1;
-		   uint64_t base_bit = log2(table_size);
-		   uint64_t max_base_bit = base_bit-1;
-	           uint64_t bit_pos = max_base_bit+table_no;	   
-		   uint64_t mask = 1;
+		   uint64_t pos = table_no*table_size+index_p;
+		   uint32_t plevel = level-1;
+		   uint64_t mask = UINT64_MAX;
+		   mask = mask >> (64-plevel);
+		   uint64_t parent = pos & mask;
+		   uint64_t p_table_no = parent/table_size;
+		   uint64_t index = parent%table_size;
+
 		   node_type *ret_node = nullptr;
 		   int t_no = p_table_no;
-		  
+
 		   LOCK_TABLE(t_no,index);
 
 		   if((*tables[p_table_no])[index].head == nullptr)
 		   {
-		      recursive_fill(p_table_no,index);
+		      recursive_fill(p_table_no,index,level-1);
 		   }
 
 		   if((*tables[p_table_no])[index].head != nullptr)
@@ -155,8 +156,8 @@ class split_map
 		   while(n->key != INT_MAX)
 		   {
 		            uint64_t hash_value = HashFcn()(n->key);
-	    		    hash_value = hash_value >> bit_pos;
-			    uint64_t bit_value = hash_value & mask;
+	    		    hash_value = hash_value >> plevel;
+			    uint64_t bit_value = hash_value & (uint64_t)1;
 		            if(bit_value) 
 			    {
 				found = true; break;
@@ -169,7 +170,7 @@ class split_map
 		   new_node->key = UINT32_MAX;
 		   new_node->next = n;
 		   p->next = new_node;
-		   (*tables[table_no])[index].head = new_node;
+		   (*tables[table_no])[index_p].head = new_node;
 		   }
 
 		   UNLOCK_TABLE(t_no,index);
@@ -180,13 +181,13 @@ class split_map
 		bool insert(KeyT k, ValueT v)
 		{
 
-		    int ntables = num_tables.load();
 		    bool added = false;
 		    uint32_t inserted = allocated.load(); uint32_t deleted = removed.load();
 		    uint32_t diff = inserted-deleted;
+		    uint32_t ntables = num_tables.load();
 		    uint32_t maxt = MAX_TABLE_SIZE;
 	
-	           if(diff > maxt)
+	           if(diff >= maxt)
 	           {		   
 	           	    
 		      boost::upgrade_lock<boost::shared_mutex> lk(t_mutex);
@@ -204,9 +205,14 @@ class split_map
 			       (*tables[ntables+j])[i].head = nullptr;
 			    }
 			    num_tables.fetch_add(new_tables);
-			    std::cout <<" num_tables added = "<<new_tables<<" num_tables = "<<num_tables.load()<<std::endl;
 			  }
-			  else std::cout <<" num_tables = "<<num_tables.load()<<" max size exceeded"<<std::endl;
+			  else 
+			  {
+				std::cout <<" num_entries = "<<allocated.load()-removed.load()<<std::endl;
+				std::cout <<" max_size = "<<0.8*num_tables.load()*table_size*MAX_COLLISIONS<<std::endl;
+				std::cout <<" num_tables = "<<num_tables.load()<<" max size exceeded"<<std::endl;
+				exit(-1);
+			  }
 		     }
 		     lk.unlock();
 		     lk.release();
@@ -225,7 +231,12 @@ class split_map
 		    node_type *p = (*tables[table_no])[index].head;
 			
 		    assert (table_no < num_tables.load());
-		    if(p==nullptr) recursive_fill(table_no,index);
+		    if(p==nullptr) 
+		    {
+			uint32_t table_p = next_power_two(table_no+1); 
+			int nbits = log2(table_p*table_size);
+			recursive_fill(table_no,index,nbits);
+		    }
 		    p = (*tables[table_no])[index].head;
 
 		    node_type *n = (*tables[table_no])[index].head->next;
@@ -250,13 +261,9 @@ class split_map
 		       std::memcpy(&(new_node->key),&k,sizeof(KeyT));
 		       std::memcpy(&(new_node->value),&v,sizeof(ValueT));
 		       new_node->next = n;
-		       if(!full.load())
-		       {
-		         p->next = new_node;
-		         allocated.fetch_add(1);
-			 added = true;
-		       }
-		       else pl->memory_pool_push(new_node);
+		       p->next = new_node;
+		       allocated.fetch_add(1);
+		       added = true;
 		   }
 
 		   UNLOCK_TABLE(t_no,index);
@@ -265,7 +272,7 @@ class split_map
 
 		   return added;
 		}
-
+		
 		bool update(KeyT k, ValueT v)
 		{
 		    boost::shared_lock<boost::shared_mutex> lk(t_mutex);
@@ -279,7 +286,11 @@ class split_map
 		    LOCK_TABLE(t_no,index);
 
 		    if((*tables[table_no])[index].head == nullptr)
-			    recursive_fill(table_no,index);
+		    {
+			    uint32_t p = next_power_two(table_no+1);
+			    uint32_t np = log2(p*table_size); 
+			    recursive_fill(table_no,index,np);
+		    }
 
 		    node_type *n = (*tables[table_no])[index].head->next;
 
@@ -315,7 +326,11 @@ class split_map
 		   LOCK_TABLE(t_no,index);
 
 		   if((*tables[table_no])[index].head==nullptr)
-			recursive_fill(table_no,index);
+		   {
+			uint32_t p = next_power_two(table_no+1);
+			uint32_t np = log2(p*table_size); 
+			recursive_fill(table_no,index,np);
+		   }
 
 		   node_type *n = (*tables[table_no])[index].head->next;
 
@@ -349,10 +364,13 @@ class split_map
 
 		    LOCK_TABLE(t_no,index);
 	   		   
+		    if((*tables[table_no])[index].head==nullptr)
+		    {
+			  uint32_t table_n = next_power_two(table_no+1);
+			  uint32_t np = log2(table_n*table_size);
+			  recursive_fill(table_no,index,np);
+		    }
 		    node_type *p = (*tables[table_no])[index].head;
-		    if(p==nullptr)
-			  recursive_fill(table_no,index);
-		    p = (*tables[table_no])[index].head;
 		    node_type *n = (*tables[table_no])[index].head->next;
 
 		    while(!EqualFcn()(n->key,INT_MAX))
@@ -379,10 +397,13 @@ class split_map
 		   return true;
 		}
 
-		void map_full()
+		uint32_t allocated_entries()
 		{
-			//std::cout <<" num_entries = "<<allocated.load()-removed.load()<<std::endl;
-			//std::cout <<" max_table_size = "<<MAX_TABLE_SIZE<<std::endl;
+		   return allocated.load();
+		}
+		uint32_t removed_entries()
+		{
+		    return removed.load();
 		}
 };
 
