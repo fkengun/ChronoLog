@@ -191,6 +191,15 @@ class BlockMap
 	   return found;
 	}
 
+	bool get(KeyT k,ValueT *v)
+	{
+	    bool found = false;
+
+
+
+	   return false;
+	}
+
 	bool erase(KeyT k)
 	{
 	   uint64_t pos = KeyToIndex(k);
