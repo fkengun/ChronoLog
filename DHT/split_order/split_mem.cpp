@@ -16,15 +16,13 @@ void map_operations(struct thread_arg *t)
     {
         int op = random()%3;
         int32_t k = (int32_t) random()%100000000;
-	if(k==15425001) std::cout <<" op = "<<op<<" k = "<<k<<std::endl;
         if(op==0)
            int s = sp->insert(k,k);
-        /*else if(op==1)
-           int pos = sp->find(k);*/
+        else if(op==1)
+           int pos = sp->find(k);
         else if(op==2)
 	{
 	    bool s = sp->erase(k);
-	    //if(s) std::cout <<" k = "<<k<<" erased"<<std::endl;
 	}
 
     }
@@ -37,13 +35,13 @@ int main(int argc,char **argv)
 
 	memory_pool<int32_t,int32_t> *m = new memory_pool<int32_t,int32_t> (100);
 
-	sp =  new split_map<int32_t,int32_t> (512,4096,m);
+	sp =  new split_map<int32_t,int32_t> (1024,4096,m);
 
-	int num_threads = 1;
+	int num_threads = 12;
 	std::vector<struct thread_arg> t_args(num_threads);
 	std::vector<std::thread> workers(num_threads);
 
-	int num_operations = 10000000;
+	int num_operations = 100000000;
 	int np = num_operations/num_threads;
 	int rem = num_operations%num_threads;
 

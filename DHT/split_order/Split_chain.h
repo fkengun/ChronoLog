@@ -15,19 +15,8 @@
 #include "node.h"
 #include <bitset>
 
-#define MAX_COLLISIONS 10
+#define MAX_COLLISIONS 40
 #define MAX_TABLE_SIZE 0.8*ntables*table_size*MAX_COLLISIONS
-
-#define LOCK_TABLE(t_no,index) \
-uint32_t prev = 0, next = 1; \
-do \
-{ \
-    prev = 0; next = 1; \
-}while(!(*tables[t_no])[index].node_lock.compare_exchange_strong(prev,next));
-
-#define UNLOCK_TABLE(t_no,index) \
-(*tables[t_no])[index].node_lock.store(0);	
-
 
 template <class KeyT,
 	 class ValueT,
@@ -90,7 +79,7 @@ class split_map
 		     list = nullptr;
 		     int c = 1;
 
-		     KeyT k = INT32_MAX; 
+		     KeyT k = UINT32_MAX; 
 		
 		     node_type *new_node = pl->memory_pool_pop();
 		     std::memcpy(&(new_node->key),&k,sizeof(KeyT));
@@ -141,6 +130,21 @@ class split_map
 
 		}
 
+		void lock_table(int t_no,int index)
+		{
+		   uint32_t prev,next;
+
+		   do
+		   {
+		      prev = 0, next = 1;
+		   }while(!(*tables[t_no])[index].node_lock.compare_exchange_strong(prev,next));
+		}
+
+		void unlock_table(int t_no,int index)
+		{
+		   (*tables[t_no])[index].node_lock.store(0);
+		}
+
 		void recursive_fill(uint64_t hash_value,uint32_t level)
 		{
 		   uint64_t mask = UINT64_MAX;
@@ -150,47 +154,43 @@ class split_map
 		   uint64_t table_no = pos/table_size;
 		   uint64_t index_p = pos%table_size;
 		   uint32_t plevel = level-1;
+		   mask = 1;
+		   mask = mask << (plevel-1);
+		   uint64_t p_hash_value = hash_value | mask;
 		   mask = UINT64_MAX;
 		   mask = mask >> (64-plevel);
-		   uint64_t parent = hash_value & mask;
+		   uint64_t parent = p_hash_value & mask;
 		   uint64_t p_table_no = parent/table_size;
 		   uint64_t index = parent%table_size;
 
 		   node_type *ret_node = nullptr;
 		   int t_no = p_table_no;
-		  	 
-		   /*if(p_table_no==16 && level==18)
-		   {
-	             std::cout <<" pos = "<<std::bitset<64>(pos)<<std::endl;
-	             std::cout <<" parent = "<<std::bitset<64>(parent)<<std::endl;
-		     std::cout <<" pos = "<<pos<<" level = "<<level<<" table_no = "<<table_no<<" index_p = "<<index<<" parent = "<<parent<<" p_table_no = "<<p_table_no<<" index = "<<index<<" plevel = "<<plevel<<std::endl;
-		   }*/
-		   LOCK_TABLE(t_no,index);
 
-		   if((*tables[p_table_no])[index].head == nullptr)
+		   lock_table(t_no,index);
+
+		   if(plevel > log2(table_size))
 		   {
-		      recursive_fill(hash_value,level-1);
+		      if((*tables[p_table_no])[index].head == nullptr)
+		      {
+		         recursive_fill(p_hash_value,level-1);
+		      }
 		   }
+		   
+		   unlock_table(t_no,index);
+                   
+		   parent = hash_value & mask;
+		   p_table_no = parent/table_size;
+		   index = parent%table_size;
+		   t_no = p_table_no;
 
-		   if((*tables[p_table_no])[index].head != nullptr)
-		   {
+		   lock_table(t_no,index);
+
 		   node_type *p = (*tables[p_table_no])[index].head;
 		   node_type *n = (*tables[p_table_no])[index].head->next;
 		   assert (p != nullptr && n!=nullptr);
 		   bool found = false; 
-		 /*	
-		   if(p_table_no==16 && level==18)
-		   {
-			while(n->key != INT32_MAX)
-			{
-			  std::cout <<" key = "<<std::bitset<64>(reverse(HashFcn()(n->key)))<<std::endl;
-		          n = n->next;	
-		        }
-		   }*/
-
-		   n = (*tables[p_table_no])[index].head->next;
-
-		   while(n->key != INT32_MAX)
+		
+		   while(n->key != UINT32_MAX)
 		   {
 		            uint64_t hash_value = HashFcn()(n->key);
 	    		    hash_value = hash_value >> (plevel);
@@ -204,13 +204,12 @@ class split_map
 		   }
 		   
 		   node_type *new_node = pl->memory_pool_pop();
-		   new_node->key = INT32_MAX;
+		   new_node->key = UINT32_MAX;
 		   new_node->next = n;
 		   p->next = new_node;
 		   (*tables[table_no])[index_p].head = new_node;
-		   }
 
-		   UNLOCK_TABLE(t_no,index);
+		   unlock_table(t_no,index);
 
 		   return;
 		}
@@ -266,7 +265,7 @@ class split_map
 		    uint64_t index = pos%table_size;
 		    uint64_t t_no = table_no;
 
-		    LOCK_TABLE(t_no,index);
+		    lock_table(t_no,index);
 
 		    node_type *p = (*tables[table_no])[index].head;
 			
@@ -274,25 +273,23 @@ class split_map
 		    uint32_t table_p = next_power_two(table_no+1);
 		    int nbits = log2(table_p*table_size);
 
-		    node_type *n;
+
 		    if(p==nullptr) 
 		    {
 			recursive_fill(HashFcn()(k),nbits);
 		    }
-		    p = (*tables[table_no])[index].head;
 
-		    n = (*tables[table_no])[index].head->next;
+		    p = (*tables[table_no])[index].head;
+		    node_type *n = (*tables[table_no])[index].head->next;
 
 		    bool found = false;
 		    added = false;
 			
-		    n = (*tables[table_no])[index].head->next;
-		    while(!EqualFcn()(n->key,INT32_MAX))
+		    while(!EqualFcn()(n->key,UINT32_MAX))
 		    {
 			if(EqualFcn()(n->key,k)) found = true;
-			uint64_t k1 = reverse(HashFcn()(n->key));
-			uint64_t k2 = reverse(HashFcn()(k));
-			if(k1 > k2)
+
+			if(reverse(HashFcn()(n->key)) > reverse(HashFcn()(k)))
 			{
 				break;
 			}
@@ -302,7 +299,6 @@ class split_map
 
 		   if(!found)
 		   {
-		       if(k==15425001) std::cout <<" insert k = "<<k<<" table_no = "<<table_no<<" index = "<<index<<std::endl;
 		       node_type *new_node = pl->memory_pool_pop();
 		       std::memcpy(&(new_node->key),&k,sizeof(KeyT));
 		       std::memcpy(&(new_node->value),&v,sizeof(ValueT));
@@ -312,13 +308,13 @@ class split_map
 		       added = true;
 		   }
 
-		   UNLOCK_TABLE(t_no,index);
+		   unlock_table(t_no,index);
 		   lk.unlock();
 		   lk.release();
 
 		   return added;
 		}
-		/*	        	
+		        	
 		bool update(KeyT k, ValueT v)
 		{
 		    boost::shared_lock<boost::shared_mutex> lk(t_mutex);
@@ -329,29 +325,29 @@ class split_map
 		    uint64_t index = pos%table_size;
 		    uint64_t t_no = table_no;
 
-		    LOCK_TABLE(t_no,index);
+		    lock_table(t_no,index);
 
 		    if((*tables[table_no])[index].head == nullptr)
 		    {
-			    uint32_t p = next_power_two(table_no+1);
-			    uint32_t np = log2(p*table_size); 
-			    recursive_fill(HashFcn()(k),np);
+		      uint32_t p = next_power_two(table_no+1);
+		      uint32_t np = log2(p*table_size); 
+		      recursive_fill(HashFcn()(k),np);
 		    }
 
 		    node_type *n = (*tables[table_no])[index].head->next;
 
-		    while(!EqualFcn()(n->key,INT32_MAX))
+		    while(!EqualFcn()(n->key,UINT32_MAX))
 		    {
 			    if(EqualFcn()(n->key,k))
 			    {
 				  found = true;
 				  std::memcpy(&(n->value),&v,sizeof(ValueT));
 			    }
-			    if(HashFcn()(n->key) > HashFcn()(k)) break;
+			    if(reverse(HashFcn()(n->key)) > reverse(HashFcn()(k))) break;
 			    n = n->next;
 		    }
 
-		    UNLOCK_TABLE(t_no,index);
+		    unlock_table(t_no,index);
 		    lk.unlock();
 		    lk.release();
 
@@ -369,7 +365,7 @@ class split_map
 		   uint64_t index = pos%table_size;
 	           uint64_t t_no = table_no;
 
-		   LOCK_TABLE(t_no,index);
+		   lock_table(t_no,index);
 
 		   if((*tables[table_no])[index].head==nullptr)
 		   {
@@ -380,22 +376,21 @@ class split_map
 
 		   node_type *n = (*tables[table_no])[index].head->next;
 
-		   while(!EqualFcn()(n->key,INT32_MAX))
+		   while(!EqualFcn()(n->key,UINT32_MAX))
 		   {
 		       if(EqualFcn()(n->key,k))
 		       {
-			    found = true; 
+			    found = true;
 		       }
-		       if(HashFcn()(n->key) > HashFcn()(k)) break;
-
+		       if(reverse(HashFcn()(n->key)) > reverse(HashFcn()(k))) break;
 		       n = n->next;
 		   }
-		   UNLOCK_TABLE(t_no,index);
+		   unlock_table(t_no,index);
 		   lk.unlock();
 		   lk.release();
 
 		   return found;
-		}*/
+		}
 
 		bool erase(KeyT k)
 		{
@@ -408,7 +403,7 @@ class split_map
 		   uint64_t index = pos%table_size;
 	 	   uint64_t t_no = table_no;
 
-		    LOCK_TABLE(t_no,index);
+		   lock_table(t_no,index);
 	   	
 		    if((*tables[table_no])[index].head==nullptr)
 		    {
@@ -417,25 +412,17 @@ class split_map
 			  recursive_fill(HashFcn()(k),np);
 		    }
 
-		    if(k==15425001) std::cout <<" erase k = "<<k<<" table_no = "<<table_no<<" index = "<<index<<std::endl;
 		    node_type *p = (*tables[table_no])[index].head;
 		    node_type *n = (*tables[table_no])[index].head->next;
 
-	            /*while(!EqualFcn()(n->key,INT32_MAX))
-		    {
-			
-			std::cout <<" key = "<<n->key<<" k_v = "<<std::bitset<64>(reverse(HashFcn()(n->key)))<<std::endl;
-			n = n->next;
-		    }*/
-
-		    n = (*tables[table_no])[index].head->next;
-		    while(!EqualFcn()(n->key,INT32_MAX))
+		    while(!EqualFcn()(n->key,UINT32_MAX))
 		    {
 			
 			if(EqualFcn()(n->key,k))
 			{
 			    found = true; break; 
 			}
+			if(reverse(HashFcn()(n->key)) > reverse(HashFcn()(k))) break;
 			p = n;
 			n = n->next;
 		    }
@@ -447,7 +434,7 @@ class split_map
 			removed.fetch_add(1);
 		    }
 
-		    UNLOCK_TABLE(t_no,index);
+		    unlock_table(t_no,index);
 		    lk.unlock();
 		    lk.release();
 		   return found;
