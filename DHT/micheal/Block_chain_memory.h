@@ -195,8 +195,24 @@ class BlockMap
 	{
 	    bool found = false;
 
+	    uint64_t pos = KeyToIndex(k);
 
+	    table[pos].mutex_t.lock();
 
+	    node_type *n = table[pos].head;
+
+	    while(n != nullptr)
+	    {
+		if(EqualFcn()(n->key,k))
+		{
+		   found = true;
+		   std::memcpy(v,&(n->value),sizeof(ValueT));
+		}
+		if(HashFcn()(n->key) > HashFcn()(k)) break;
+		n = n->next;
+	    }
+
+	    table[pos].mutex_t.unlock();
 	   return false;
 	}
 
