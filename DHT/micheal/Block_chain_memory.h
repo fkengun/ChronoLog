@@ -10,6 +10,8 @@
 #include <cassert>
 #include <atomic>
 #include <memory>
+#include <type_traits>
+#include <string>
 #include "node.h"
 #include "memory_allocation.h"
 
@@ -212,8 +214,35 @@ class BlockMap
 		n = n->next;
 	    }
 
+	   table[pos].mutex_t.unlock();
+
+	   return found;
+	}
+	
+	template<typename... Args>
+	bool update_field(KeyT k,void(*fn)(ValueT *,Args&&... args),Args&&... args_)
+	{
+	    bool found = false;
+	    uint64_t pos = KeyToIndex(k);
+
+	    table[pos].mutex_t.lock();
+
+	    node_type *n = table[pos].head;
+
+	    while(n != nullptr)
+	    {
+		if(EqualFcn()(n->key,k))
+		{
+		    found = true;
+		    fn(&(n->value),std::forward<Args>(args_)...);
+		}
+		if(HashFcn()(n->key) > HashFcn()(k)) break;
+		n = n->next; 
+	    }
+
 	    table[pos].mutex_t.unlock();
-	   return false;
+
+	    return found;
 	}
 
 	bool erase(KeyT k)
@@ -292,5 +321,6 @@ class BlockMap
 	   else return true;
 	}	   
 };
+
 
 #endif

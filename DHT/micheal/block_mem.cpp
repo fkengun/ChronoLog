@@ -53,7 +53,7 @@ int main(int argc,char **argv)
     memory_pool<int32_t,int32_t> *p = new memory_pool<int32_t,int32_t> (100);    
     m = new BlockMap<int32_t,int32_t> (65536,p,INT_MAX);
 
-    int num_operations = 1000000000;
+    int num_operations = 100000;
 
     int num_threads = 4;
 
