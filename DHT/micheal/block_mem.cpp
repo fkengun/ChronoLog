@@ -53,9 +53,9 @@ int main(int argc,char **argv)
     memory_pool<int32_t,int32_t> *p = new memory_pool<int32_t,int32_t> (100);    
     m = new BlockMap<int32_t,int32_t> (65536,p,INT_MAX);
 
-    int num_operations = 100000;
+    int num_operations = 10000000;
 
-    int num_threads = 4;
+    int num_threads = 12;
 
     std::vector<std::thread> workers(num_threads);
     std::vector<thread_arg> t_args(num_threads);

@@ -6,6 +6,8 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <cstdarg>
+#include <functional>
 #include "node.h"
 
 #define MIN_FREE_NODES 100
