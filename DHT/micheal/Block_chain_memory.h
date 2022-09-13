@@ -107,8 +107,8 @@ class BlockMap
 	    {
 		allocated.fetch_add(1);
 		node_type *new_node=pl->memory_pool_pop();
-		new_node->key = k;
-		new_node->value = v;
+		new (&(new_node->key)) KeyT(k);
+		new (&(new_node->value)) ValueT(v);
 		new_node->next = n;
 		p->next = new_node;
 		table[pos].num_nodes++;
