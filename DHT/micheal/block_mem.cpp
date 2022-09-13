@@ -1,6 +1,7 @@
 #include "Block_chain_memory.h"
 #include <thread>
 #include <chrono>
+#include <random>
 //#include "city.h"
 /*
 struct HashTraits
