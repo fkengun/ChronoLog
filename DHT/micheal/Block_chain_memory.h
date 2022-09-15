@@ -51,7 +51,7 @@ class BlockMap
 	boost::atomic<boost::int128_type> full_empty;
 	KeyT emptyKey;
 
-	uint64_t KeyToIndex(KeyT k)
+	uint64_t KeyToIndex(KeyT &k)
 	{
 	    uint64_t hashval = HashFcn()(k);
 	    return hashval % maxSize;
@@ -81,7 +81,7 @@ class BlockMap
 	    std::free(table);
 	}
 
-	int insert(KeyT k,ValueT v)
+	uint32_t insert(KeyT &k,ValueT &v)
 	{
 	    uint64_t pos = KeyToIndex(k);
 
@@ -102,7 +102,7 @@ class BlockMap
 		n = n->next;
 	    }
 
-	    int ret = (found) ? EXISTS : 0;
+	    uint32_t ret = (found) ? EXISTS : 0;
 	    if(!found)
 	    {
 		allocated.fetch_add(1);
@@ -120,7 +120,7 @@ class BlockMap
 	   return ret;
 	}
 
-	uint64_t find(KeyT k)
+	uint64_t find(KeyT &k)
 	{
 	    uint64_t pos = KeyToIndex(k);
 
@@ -143,7 +143,7 @@ class BlockMap
 	    return (found ? pos : NOT_IN_TABLE);
 	}
 
-	bool update(KeyT k,ValueT v)
+	bool update(KeyT &k,ValueT &v)
 	{
 	   uint64_t pos = KeyToIndex(k);
 
@@ -167,7 +167,7 @@ class BlockMap
 	   return found;
 	}
 
-	bool get(KeyT k,ValueT *v)
+	bool get(KeyT &k,ValueT *v)
 	{
 	    bool found = false;
 
@@ -194,7 +194,7 @@ class BlockMap
 	}
 	
 	template<typename... Args>
-	bool update_field(KeyT k,void(*fn)(ValueT *,Args&&... args),Args&&... args_)
+	bool update_field(KeyT &k,void(*fn)(ValueT *,Args&&... args),Args&&... args_)
 	{
 	    bool found = false;
 	    uint64_t pos = KeyToIndex(k);
@@ -219,7 +219,7 @@ class BlockMap
 	    return found;
 	}
 
-	bool erase(KeyT k)
+	bool erase(KeyT &k)
 	{
 	   uint64_t pos = KeyToIndex(k);
 
