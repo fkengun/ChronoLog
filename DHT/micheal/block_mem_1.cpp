@@ -53,9 +53,16 @@ public:
 	d = e.d;
 	return *this;
    }
+   void increment()
+   {
+	   c++;
+   }
 };
 
-
+void update_c(entity *e)
+{
+	e->increment();
+}
 
 BlockMap<int32_t,entity> *m;
 
@@ -71,7 +78,7 @@ void map_operations(thread_arg *t)
 {
     for(int i=0;i<t->num_operations;i++)
     {
-	int op = random()%4;
+	int op = random()%5;
 	int k = random()%100000000;
 	if(op==0)
 	{
@@ -86,6 +93,10 @@ void map_operations(thread_arg *t)
 	    entity e;
 	    bool s = m->get(k,&e);
 	}
+	else if(op==4)
+	{
+	   bool s = m->update_field(k,update_c);
+	}
 
     }	    
 
@@ -97,7 +108,7 @@ int main(int argc,char **argv)
     memory_pool<int32_t,entity> *p = new memory_pool<int32_t,entity> (100);    
     m = new BlockMap<int32_t,entity> (65536,p,INT_MAX);
 
-    int num_operations = 1000000;
+    int num_operations = 10000000;
 
     int num_threads = 12;
 
