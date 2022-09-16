@@ -22,7 +22,42 @@ struct EqualTraits
 
 };*/
 
-BlockMap<int32_t,int32_t> *m;
+class entity
+{
+private:
+    int a;
+    int b;
+    int c;
+    int *d;
+public:    
+   entity()
+   {
+	a=0;b=0;c=0;d=nullptr;
+   }
+   entity(int n) : a(n)
+   {
+
+   }
+   entity(entity &e)
+   {
+	a = e.a;
+	b = e.b;
+	c = e.c;
+	d = e.d;
+   }
+   entity& operator=(entity& e)
+   {
+	a = e.a;
+	b = e.b;
+	c = e.c;
+	d = e.d;
+	return *this;
+   }
+};
+
+
+
+BlockMap<int32_t,entity> *m;
 
 //BlockMap<std::string,uint32_t,HashTraits,EqualTraits> *m;
 
@@ -36,13 +71,21 @@ void map_operations(thread_arg *t)
 {
     for(int i=0;i<t->num_operations;i++)
     {
-	int op = random()%3;
+	int op = random()%4;
 	int k = random()%100000000;
 	if(op==0)
-	   int s = m->insert(k,k);
+	{
+	   entity e(k);
+	   int s = m->insert(k,e);
+	}
 	else if(op==1)
 	   int pos = m->find(k);
-	else bool s = m->erase(k);
+	else if(op==2) bool s = m->erase(k);
+	else if(op==3)
+	{
+	    entity e;
+	    bool s = m->get(k,&e);
+	}
 
     }	    
 
@@ -51,10 +94,10 @@ void map_operations(thread_arg *t)
 int main(int argc,char **argv)
 {
 
-    memory_pool<int32_t,int32_t> *p = new memory_pool<int32_t,int32_t> (100);    
-    m = new BlockMap<int32_t,int32_t> (65536,p,INT_MAX);
+    memory_pool<int32_t,entity> *p = new memory_pool<int32_t,entity> (100);    
+    m = new BlockMap<int32_t,entity> (65536,p,INT_MAX);
 
-    int num_operations = 100000000;
+    int num_operations = 1000000;
 
     int num_threads = 12;
 
@@ -80,6 +123,8 @@ int main(int argc,char **argv)
 
     auto t2 = std::chrono::high_resolution_clock::now();
     double time_taken = std::chrono::duration<double> (t2-t1).count();
+
+   // m->print_block_entries(print_value);
 
     std::cout <<" time taken = "<<time_taken<<std::endl;
     std::cout <<" allocated = "<<m->allocated_nodes()<<" removed = "<<m->removed_nodes()<<std::endl;

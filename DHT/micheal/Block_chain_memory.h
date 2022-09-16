@@ -81,6 +81,7 @@ class BlockMap
 	    std::free(table);
 	}
 
+
 	uint32_t insert(KeyT &k,ValueT &v)
 	{
 	    uint64_t pos = KeyToIndex(k);
@@ -126,7 +127,7 @@ class BlockMap
 
 	    table[pos].mutex_t.lock();
 
-	    node_type *n = table[pos].head;
+	    node_type *n = table[pos].head->next;
 	    bool found = false;
 	    while(n != nullptr)
 	    {
@@ -149,7 +150,7 @@ class BlockMap
 
 	   table[pos].mutex_t.lock();
 
-	   node_type *n = table[pos].head;
+	   node_type *n = table[pos].head->next;
 
 	   bool found = false;
 	   while(n != nullptr)
@@ -175,7 +176,7 @@ class BlockMap
 
 	    table[pos].mutex_t.lock();
 
-	    node_type *n = table[pos].head;
+	    node_type *n = table[pos].head->next;
 
 	    while(n != nullptr)
 	    {
@@ -201,7 +202,7 @@ class BlockMap
 
 	    table[pos].mutex_t.lock();
 
-	    node_type *n = table[pos].head;
+	    node_type *n = table[pos].head->next;
 
 	    while(n != nullptr)
 	    {
@@ -271,6 +272,22 @@ class BlockMap
 		num_entries += table[i].num_nodes;
 	   }
 	   return num_entries;
+	}
+
+	void print_block_entries(void(*pfn)(ValueT&))
+	{
+	   for(size_t i=0;i<maxSize;i++)
+	   {
+		node_type *n = table[i].head->next;
+		while(n != nullptr)
+		{
+			std::cout <<" key = "<<n->key<<std::endl;
+			pfn(n->value);
+			n = n->next;
+		}
+
+	   }
+
 	}
 	
 };
