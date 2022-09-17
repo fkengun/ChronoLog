@@ -13,7 +13,6 @@
 #include <boost/thread/shared_mutex.hpp>
 #include "memory_allocation.h"
 #include "node.h"
-#include <bitset>
 
 #define MAX_COLLISIONS 40
 #define MAX_TABLE_SIZE 0.8*ntables*table_size*MAX_COLLISIONS
