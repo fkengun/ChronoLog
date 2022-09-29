@@ -16,14 +16,17 @@ void map_operations(thread_arg *t)
     for(int i=0;i<t->num_operations;i++)
     {
 	int op = random()%3;
-	int k = random()%100000000;
+	int32_t k = random()%100000000;
 	if(op==0)
 	{
 	   int s = m->insert(k,k);
 	}
 	else if(op==1)
 	  int pos = m->find(k);
-	else if(op==2) bool s = m->erase(k);
+	else if(op==2) 
+	{
+		bool s = m->erase(k);
+	}
     }	    
 
 }
@@ -34,7 +37,7 @@ int main(int argc,char **argv)
     memory_pool<int32_t,int32_t> *p = new memory_pool<int32_t,int32_t> (100);    
     m = new BlockMap_ml<int32_t,int32_t> (65536,p,64);
 
-    int num_operations = 1000000000;
+    int num_operations = 10000000;
 
     int num_threads = 12;
 

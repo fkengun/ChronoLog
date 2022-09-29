@@ -35,7 +35,7 @@ int main(int argc,char **argv)
 
 	memory_pool<int32_t,int32_t> *m = new memory_pool<int32_t,int32_t> (100);
 
-	sp =  new split_map<int32_t,int32_t> (1024,4096,m);
+	sp =  new split_map<int32_t,int32_t> (1024,65536,m);
 
 	int num_threads = 12;
 	std::vector<struct thread_arg> t_args(num_threads);

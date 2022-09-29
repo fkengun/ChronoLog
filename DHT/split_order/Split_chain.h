@@ -14,7 +14,7 @@
 #include "memory_allocation.h"
 #include "node.h"
 
-#define MAX_COLLISIONS 40
+#define MAX_COLLISIONS 10
 #define MAX_TABLE_SIZE 0.8*ntables*table_size*MAX_COLLISIONS
 
 template <class KeyT,
@@ -236,10 +236,10 @@ class split_map
 			    for(int j=0;j<new_tables;j++)
 			    {
 			      tables[ntables+j] = new std::vector<head_type> (table_size);
-			      for(int i=0;i<table_size;i++)
+			      /*for(int i=0;i<table_size;i++)
 			      {
 			       (*tables[ntables+j])[i].head = nullptr;
-			      }
+			      }*/
 			    }
 			    num_tables.fetch_add(new_tables);
 			    std::cout <<" ntables = "<<ntables<<" num_tables = "<<num_tables.load()<<std::endl;

@@ -58,21 +58,21 @@ class BlockMap
 	boost::atomic<boost::int128_type> full_empty;
 	KeyT emptyKey;
 
-	uint64_t KeyToIndex(KeyT &k)
+	uint64_t KeyToIndex(KeyT k)
 	{
 	    uint64_t hashval = HashFcn()(k);
 	    return hashval % maxSize;
 	}
 
 public:
-	bool isLocal(KeyT &k)
+	bool isLocal(KeyT k)
 	{
 	    uint64_t hashval = HashFcn()(k);
 	    uint64_t pos = hashval % totalSize;
 	    if(pos >= min_range && pos < max_range) return true;
 	    else return false;
 	}
-	uint64_t procLocation(KeyT &k)
+	uint64_t procLocation(KeyT k)
 	{
 	   uint64_t localSize = totalSize/num_procs;
 	   uint64_t rem = totalSize%num_procs;
@@ -132,7 +132,7 @@ public:
 	    std::free(table);
 	}
 
-	uint32_t insert(KeyT &k,ValueT &v)
+	int insert(KeyT k,ValueT v)
 	{
 	    uint64_t pos = KeyToIndex(k);
 
@@ -153,7 +153,7 @@ public:
 		n = n->next;
 	    }
 
-	    uint32_t ret = (found) ? EXISTS : 0;
+	    int ret = (found) ? EXISTS : 0;
 	    if(!found)
 	    {
 		boost::int128_type prev, next;
@@ -175,7 +175,7 @@ public:
 	   return ret;
 	}
 
-	uint64_t find(KeyT &k)
+	uint64_t find(KeyT k)
 	{
 	    uint64_t pos = KeyToIndex(k);
 
@@ -198,7 +198,7 @@ public:
 	    return (found ? pos : NOT_IN_TABLE);
 	}
 
-	bool update(KeyT &k,ValueT &v)
+	bool update(KeyT k,ValueT v)
 	{
 	   uint64_t pos = KeyToIndex(k);
 
@@ -222,7 +222,7 @@ public:
 	   return found;
 	}
 
-	bool erase(KeyT &k)
+	bool erase(KeyT k)
 	{
 	   uint64_t pos = KeyToIndex(k);
 

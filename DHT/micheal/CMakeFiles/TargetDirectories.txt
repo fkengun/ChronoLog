@@ -1,0 +1,5 @@
+/home/aparna/Documents/filesystems/DHT/micheal/CMakeFiles/block_mem.dir
+/home/aparna/Documents/filesystems/DHT/micheal/CMakeFiles/block_mem_abt.dir
+/home/aparna/Documents/filesystems/DHT/micheal/CMakeFiles/block_mem_dist.dir
+/home/aparna/Documents/filesystems/DHT/micheal/CMakeFiles/edit_cache.dir
+/home/aparna/Documents/filesystems/DHT/micheal/CMakeFiles/rebuild_cache.dir
