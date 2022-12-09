@@ -1,3 +1,0 @@
-/home/aparna/Documents/filesystems/DHT/split_order/CMakeFiles/split_mem.dir
-/home/aparna/Documents/filesystems/DHT/split_order/CMakeFiles/edit_cache.dir
-/home/aparna/Documents/filesystems/DHT/split_order/CMakeFiles/rebuild_cache.dir
