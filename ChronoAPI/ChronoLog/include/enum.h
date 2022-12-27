@@ -11,4 +11,11 @@ typedef enum ChronoLogRPCImplementation {
     CHRONOLOG_THALLIUM_ROCE = 2
 } ChronoLogRPCImplementation;
 
+
+typedef enum ChonoLogClientRoles 
+{
+  CHRONOLOG_CLIENT_ADMIN = 0,
+  CHRONOLOG_CLIENT_USER = 1
+}ChronoLogClientRoles;
+
 #endif //CHRONOLOG_ENUM_H

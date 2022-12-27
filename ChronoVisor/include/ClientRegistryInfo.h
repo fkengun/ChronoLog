@@ -24,11 +24,13 @@ public:
     template<typename A> friend void serialize(A& ar, ClientRegistryInfo& r);
 
     std::string addr_;
+    int client_role_;
 };
 
 template<typename A>
 void serialize(A& ar, ClientRegistryInfo& r) {
     ar & r.addr_;
+    ar & r.client_role_;
 }
 
 #endif //SOCKETPP_CLIENTREGISTRYINFO_H

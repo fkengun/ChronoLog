@@ -39,21 +39,22 @@ public:
 
     ~ChronoLogAdminRPCProxy() = default;
 
-    bool LocalConnect(const std::string &uri, std::string &client_id) {
+    bool LocalConnect(const std::string &uri, std::string &client_id, int &client_role) {
         LOGD("%s in ChronoLogAdminRPCProxy@%p called in PID=%d, with args: uri=%s",
              __FUNCTION__, this, getpid(), uri.c_str());
         ClientRegistryInfo record;
         record.addr_ = "127.0.0.1";
+	record.client_role_ = CHRONOLOG_CLIENT_USER;
 //        return ChronoLog::Singleton<ClientRegistryManager>::GetInstance()->add_client_record(client_id, record);
         extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
         g_clientRegistryManager->add_client_record(client_id, record);
         return true;
     }
 
-    bool Connect(const std::string &uri, std::string &client_id) {
+    bool Connect(const std::string &uri, std::string &client_id, int &client_role) {
         LOGD("%s in ChronoLogAdminRPCProxy at addresss %p called in PID=%d, with args: uri=%s, client_id=%s",
              __FUNCTION__, this, getpid(), uri.c_str(), client_id.c_str());
-        return CHRONOLOG_RPC_CALL_WRAPPER("Connect", 0, bool, uri, client_id);
+        return CHRONOLOG_RPC_CALL_WRAPPER("Connect", 0, bool, uri, client_id,client_role);
     }
 
     bool LocalDisconnect(const std::string &client_id, int &flags) {
@@ -76,11 +77,13 @@ public:
             case CHRONOLOG_THALLIUM_ROCE: {
                 std::function<void(const tl::request &,
                                    const std::string &,
-                                   std::string &)> connectFunc(
-                        [this](auto && PH1, auto && PH2, auto && PH3) {
+                                   std::string &,
+				   int &)> connectFunc(
+                        [this](auto && PH1, auto && PH2, auto && PH3, auto && PH4) {
                             ThalliumLocalConnect(std::forward<decltype(PH1)>(PH1),
                                     std::forward<decltype(PH2)>(PH2),
-                                    std::forward<decltype(PH3)>(PH3));
+                                    std::forward<decltype(PH3)>(PH3),
+				    std::forward<decltype(PH4)>(PH4));
                         }
                 );
                 std::function<void(const tl::request &,
@@ -99,8 +102,8 @@ public:
         }
     }
 
-    CHRONOLOG_THALLIUM_DEFINE(LocalConnect, (uri, client_id),
-                    const std::string &uri, std::string &client_id)
+    CHRONOLOG_THALLIUM_DEFINE(LocalConnect, (uri, client_id, client_role),
+                    const std::string &uri, std::string &client_id, int &client_role)
     CHRONOLOG_THALLIUM_DEFINE(LocalDisconnect, (client_id, flags), std::string &client_id, int &flags)
 
 private:

@@ -30,7 +30,8 @@ int main() {
         server_uri = protocol;
         server_uri += "://" + server_ip + ":" + std::to_string(base_port + i);
         t1 = std::chrono::steady_clock::now();
-        ret = client.Connect(server_uri, client_ids[i]);
+	int role;
+        ret = client.Connect(server_uri, client_ids[i],role);
         LOGD("ret: %d", ret);
         t2 = std::chrono::steady_clock::now();
         duration_connect += (t2 - t1);
