@@ -45,8 +45,11 @@ public:
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
 	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
 	int role = g_clientRegistryManager->get_client_role(client_id);
-	assert(role == CHRONOLOG_CLIENT_ADMIN ||CHRONOLOG_CLIENT_USER);
-        return g_chronicleMetaDirectory->create_chronicle(name);
+	if(role == CHRONOLOG_CLIENT_ADMIN ||role == CHRONOLOG_CLIENT_USER)
+	{
+             return g_chronicleMetaDirectory->create_chronicle(name);
+	}
+	else return false;
     }
 
     bool CreateChronicle(std::string &client_id, std::string &name, const std::unordered_map<std::string, std::string> &attrs) {
@@ -62,8 +65,11 @@ public:
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
 	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
 	int role = g_clientRegistryManager->get_client_role(client_id);
-	assert (role == CHRONOLOG_CLIENT_ADMIN);
-        return g_chronicleMetaDirectory->destroy_chronicle(name, flags);
+	if(role == CHRONOLOG_CLIENT_ADMIN)
+	{
+           return g_chronicleMetaDirectory->destroy_chronicle(name, flags);
+	}
+	else return false;
     }
 
     bool DestroyChronicle(std::string &client_id, std::string &name, const int &flags) {
@@ -76,8 +82,11 @@ public:
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
 	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
 	int role = g_clientRegistryManager->get_client_role(client_id);
-	assert (role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER);
-        return g_chronicleMetaDirectory->acquire_chronicle(name, flags);
+	if(role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER)
+	{
+           return g_chronicleMetaDirectory->acquire_chronicle(name, flags);
+	}
+	else return false;
     }
 
     bool AcquireChronicle(std::string &client_id, std::string &name, const int &flags) {
@@ -90,8 +99,11 @@ public:
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
 	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
 	int role = g_clientRegistryManager->get_client_role(client_id);
-	assert (role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER);
-        return g_chronicleMetaDirectory->release_chronicle(name, flags);
+	if(role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER)
+	{
+            return g_chronicleMetaDirectory->release_chronicle(name, flags);
+	}
+	else return false;
     }
 
     bool ReleaseChronicle(std::string &client_id, std::string &name, const int &flags) {
@@ -109,8 +121,11 @@ public:
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
 	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
 	int role = g_clientRegistryManager->get_client_role(client_id);
-	assert (role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER);
-        return g_chronicleMetaDirectory->create_story(chronicle_name, story_name, attrs);
+	if(role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER)
+	{
+           return g_chronicleMetaDirectory->create_story(chronicle_name, story_name, attrs);
+	}
+	else return false;
     }
 
     bool CreateStory(std::string &client_id, std::string &chronicle_name, std::string &story_name,
@@ -129,8 +144,11 @@ public:
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
 	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
 	int role = g_clientRegistryManager->get_client_role(client_id);
-	assert(role == CHRONOLOG_CLIENT_ADMIN);
-        return g_chronicleMetaDirectory->destroy_story(chronicle_name, story_name, flags);
+	if(role == CHRONOLOG_CLIENT_ADMIN)
+	{
+         return g_chronicleMetaDirectory->destroy_story(chronicle_name, story_name, flags);
+	}
+	return false;
     }
 
     bool DestroyStory(std::string &client_id, std::string &chronicle_name, std::string &story_name, const int &flags) {
@@ -145,8 +163,11 @@ public:
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
 	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
 	int role = g_clientRegistryManager->get_client_role(client_id);
-	assert (role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER);
-        return g_chronicleMetaDirectory->acquire_story(chronicle_name, story_name, flags);
+	if(role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER)
+	{
+           return g_chronicleMetaDirectory->acquire_story(chronicle_name, story_name, flags);
+	}
+	else return false;
     }
 
     bool AcquireStory(std::string &client_id, std::string &chronicle_name, std::string &story_name, const int &flags) {
@@ -161,8 +182,11 @@ public:
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
 	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
 	int role = g_clientRegistryManager->get_client_role(client_id);
-	assert(role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER);
-        return g_chronicleMetaDirectory->release_story(chronicle_name, story_name, flags);
+	if(role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER)
+	{
+           return g_chronicleMetaDirectory->release_story(chronicle_name, story_name, flags);
+	}
+	else return false;
     }
 
     bool ReleaseStory(std::string &client_id, std::string &chronicle_name, std::string &story_name, const int &flags) {
@@ -176,8 +200,12 @@ public:
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
 	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
 	int role = g_clientRegistryManager->get_client_role(client_id);
-	assert(role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER);
-        return g_chronicleMetaDirectory->get_chronicle_attr(name, key);
+	std::string empty;
+	if(role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER)
+	{
+           return g_chronicleMetaDirectory->get_chronicle_attr(name, key);
+	}
+	else return empty;
     }
 
     std::string GetChronicleAttr(std::string &client_id, std::string &name, const std::string &key) {
@@ -191,8 +219,11 @@ public:
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
 	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
 	int role = g_clientRegistryManager->get_client_role(client_id);
-	assert (role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER);
-        return g_chronicleMetaDirectory->edit_chronicle_attr(name, key, value);
+	if(role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER)
+	{
+           return g_chronicleMetaDirectory->edit_chronicle_attr(name, key, value);
+	}
+	else return false;
     }
 
     bool EditChronicleAttr(std::string &client_id, std::string &name, const std::string &key, const std::string &value) {
