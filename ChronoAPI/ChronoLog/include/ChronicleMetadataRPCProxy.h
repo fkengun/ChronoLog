@@ -43,6 +43,9 @@ public:
             LOGD("%s=%s", iter->first.c_str(), iter->second.c_str());
         }
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
+	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
+	int role = g_clientRegistryManager->get_client_role(client_id);
+	assert(role == CHRONOLOG_CLIENT_ADMIN ||CHRONOLOG_CLIENT_USER);
         return g_chronicleMetaDirectory->create_chronicle(name);
     }
 
@@ -57,6 +60,9 @@ public:
     bool LocalDestroyChronicle(std::string &client_id, std::string &name, const int &flags) {
         LOGD("%s is called in PID=%d, with args: name=%s, flags=%d", __FUNCTION__, getpid(), name.c_str(), flags);
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
+	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
+	int role = g_clientRegistryManager->get_client_role(client_id);
+	assert (role == CHRONOLOG_CLIENT_ADMIN);
         return g_chronicleMetaDirectory->destroy_chronicle(name, flags);
     }
 
@@ -65,9 +71,12 @@ public:
         return CHRONOLOG_RPC_CALL_WRAPPER("DestroyChronicle", 0, bool, client_id, name, flags);
     }
 
-    bool LocalAcquireChronicle(std::string &client, std::string &name, const int &flags) {
+    bool LocalAcquireChronicle(std::string &client_id, std::string &name, const int &flags) {
         LOGD("%s is called in PID=%d, with args: name=%s, flags=%d", __FUNCTION__, getpid(), name.c_str(), flags);
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
+	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
+	int role = g_clientRegistryManager->get_client_role(client_id);
+	assert (role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER);
         return g_chronicleMetaDirectory->acquire_chronicle(name, flags);
     }
 
@@ -79,6 +88,9 @@ public:
     bool LocalReleaseChronicle(std::string &client_id, std::string &name, const int &flags) {
         LOGD("%s is called in PID=%d, with args: name=%s, flags=%d", __FUNCTION__, getpid(), name.c_str(), flags);
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
+	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
+	int role = g_clientRegistryManager->get_client_role(client_id);
+	assert (role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER);
         return g_chronicleMetaDirectory->release_chronicle(name, flags);
     }
 
@@ -95,6 +107,9 @@ public:
             LOGD("%s=%s", iter->first.c_str(), iter->second.c_str());
         }
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
+	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
+	int role = g_clientRegistryManager->get_client_role(client_id);
+	assert (role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER);
         return g_chronicleMetaDirectory->create_story(chronicle_name, story_name, attrs);
     }
 
@@ -112,6 +127,9 @@ public:
         LOGD("%s is called in PID=%d, with args: chronicle_name=%s, story_name=%s, flags=%d",
              __FUNCTION__, getpid(), chronicle_name.c_str(), story_name.c_str(), flags);
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
+	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
+	int role = g_clientRegistryManager->get_client_role(client_id);
+	assert(role == CHRONOLOG_CLIENT_ADMIN);
         return g_chronicleMetaDirectory->destroy_story(chronicle_name, story_name, flags);
     }
 
@@ -125,6 +143,9 @@ public:
         LOGD("%s is called in PID=%d, with args: chronicle_name=%s, story_name=%s, flags=%d",
              __FUNCTION__, getpid(), chronicle_name.c_str(), story_name.c_str(), flags);
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
+	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
+	int role = g_clientRegistryManager->get_client_role(client_id);
+	assert (role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER);
         return g_chronicleMetaDirectory->acquire_story(chronicle_name, story_name, flags);
     }
 
@@ -138,6 +159,9 @@ public:
         LOGD("%s is called in PID=%d, with args: chronicle_name=%s, story_name=%s, flags=%d",
              __FUNCTION__, getpid(), chronicle_name.c_str(), story_name.c_str(), flags);
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
+	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
+	int role = g_clientRegistryManager->get_client_role(client_id);
+	assert(role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER);
         return g_chronicleMetaDirectory->release_story(chronicle_name, story_name, flags);
     }
 
@@ -150,6 +174,9 @@ public:
     std::string LocalGetChronicleAttr(std::string &client_id, std::string &name, const std::string &key) {
         LOGD("%s is called in PID=%d, with args: name=%s, key=%s", __FUNCTION__, getpid(), name.c_str(), key.c_str());
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
+	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
+	int role = g_clientRegistryManager->get_client_role(client_id);
+	assert(role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER);
         return g_chronicleMetaDirectory->get_chronicle_attr(name, key);
     }
 
@@ -162,6 +189,9 @@ public:
         LOGD("%s is called in PID=%d, with args: name=%s, key=%s, value=%s",
              __FUNCTION__, getpid(), name.c_str(), key.c_str(), value.c_str());
         extern std::shared_ptr<ChronicleMetaDirectory> g_chronicleMetaDirectory;
+	extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
+	int role = g_clientRegistryManager->get_client_role(client_id);
+	assert (role == CHRONOLOG_CLIENT_ADMIN || role == CHRONOLOG_CLIENT_USER);
         return g_chronicleMetaDirectory->edit_chronicle_attr(name, key, value);
     }
 

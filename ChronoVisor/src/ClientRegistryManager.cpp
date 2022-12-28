@@ -46,3 +46,23 @@ bool ClientRegistryManager::remove_client_record(const std::string &client_id, i
     } else
         return false;
 }
+
+bool ClientRegistryManager::is_client(const std::string &client_id)
+{
+
+	std::lock_guard<std::mutex> lock(g_clientRegistryMutex_);
+	std::unordered_map<std::string,ClientRegistryInfo>::iterator it = clientRegistry_->find(client_id);
+	if(it != clientRegistry_->end()) return true;
+	else return false;
+}
+
+int ClientRegistryManager::get_client_role(const std::string &client_id)
+{
+	std::lock_guard<std::mutex> lock(g_clientRegistryMutex_);
+	std::unordered_map<std::string,ClientRegistryInfo>::iterator it = clientRegistry_->find(client_id);
+        if(it != clientRegistry_->end())
+	{
+	     return (*it).second.client_role_;
+	}	
+        else return -1;
+}

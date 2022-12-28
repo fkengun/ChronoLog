@@ -17,6 +17,8 @@ public:
 
     bool add_client_record(const std::string &client_id, const ClientRegistryInfo &record);
     bool remove_client_record(const std::string& client_id, int &flags);
+    bool is_client(const std::string &client_id);
+    int get_client_role(const std::string &client_id);
 private:
     std::unordered_map<std::string, ClientRegistryInfo> *clientRegistry_;
 };
