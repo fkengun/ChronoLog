@@ -33,8 +33,11 @@ public:
     bool EditChronicleAttr(std::string &client_id, std::string &chronicle_name, const std::string &key, const std::string &value);
     bool SetClientId(std::string &client_id);
     std::string &GetClientId();
+    bool SetClientRole(int &r);
+    int GetClientRole();
 private:
     std::string client_id_;
+    int myrole_;
     std::shared_ptr<ChronicleMetadataRPCProxy> metadataRpcProxy_;
     std::shared_ptr<ChronoLogAdminRPCProxy> adminRpcProxy_;
 };

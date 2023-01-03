@@ -44,7 +44,7 @@ public:
              __FUNCTION__, this, getpid(), uri.c_str());
         ClientRegistryInfo record;
         record.addr_ = "127.0.0.1";
-	record.client_role_ = CHRONOLOG_CLIENT_USER;
+	record.client_role_ = client_role;
 //        return ChronoLog::Singleton<ClientRegistryManager>::GetInstance()->add_client_record(client_id, record);
         extern std::shared_ptr<ClientRegistryManager> g_clientRegistryManager;
         g_clientRegistryManager->add_client_record(client_id, record);

@@ -19,6 +19,7 @@ bool ChronoLogClient::Connect(const std::string &server_uri, std::string &client
     }
     client_id_ = client_id;
     if(client_role < 0 || client_role > 1) client_role = 1;
+    SetClientRole(client_role);
     return adminRpcProxy_->Connect(server_uri, client_id,client_role);
 }
 
@@ -75,4 +76,20 @@ bool ChronoLogClient::SetClientId(std::string &client_id)
 std::string& ChronoLogClient::GetClientId()
 {
 	return client_id_;
+}
+
+bool ChronoLogClient::SetClientRole(int &r)
+{
+      if(r == CHRONOLOG_CLIENT_ADMIN || r == CHRONOLOG_CLIENT_USER)
+      {
+	myrole_ = r;
+      }
+      else myrole_ = CHRONOLOG_CLIENT_USER;
+	
+      return true;
+}
+
+int ChronoLogClient::GetClientRole()
+{
+	return myrole_;
 }
