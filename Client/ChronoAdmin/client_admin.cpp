@@ -37,6 +37,7 @@ Created by Aparna on 01/12/2023
 #include <functional>
 #include <chrono>
 #include <mpi.h>
+#include "log.h"
 
 typedef struct workload_conf_args_
 {
@@ -338,7 +339,8 @@ int main(int argc, char**argv)
     ret = client.Connect();
     assert(ret == chronolog::CL_SUCCESS);
 
-    std::cout << " connected to server address : " << server_uri << std::endl;
+    Logger::getLogger()->info("connected to server address : {}", server_uri);
+    /*std::cout << " connected to server address : " << server_uri << std::endl;*/
 
     std::chrono::steady_clock::time_point t1, t2;
     t1 = std::chrono::steady_clock::now();
