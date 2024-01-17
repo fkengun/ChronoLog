@@ -339,7 +339,7 @@ int main(int argc, char**argv)
     ret = client.Connect();
     assert(ret == chronolog::CL_SUCCESS);
 
-    Logger::getLogger()->info("connected to server address : {}", server_uri);
+    LOGI("connected to server address : {}", server_uri);
     /*std::cout << " connected to server address : " << server_uri << std::endl;*/
 
     std::chrono::steady_clock::time_point t1, t2;
