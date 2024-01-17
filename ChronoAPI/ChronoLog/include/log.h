@@ -61,9 +61,9 @@ public:
      */
     static std::shared_ptr <spdlog::logger> getLogger();
 
-    // Delete copy constructor and copy assignment operator to enforce singleton pattern
-    Logger(const Logger &) = delete;
+    ~Logger() = default;
 
+    Logger(const Logger &) = delete;
     Logger &operator=(const Logger &) = delete;
 
 private:
@@ -88,8 +88,6 @@ private:
     static std::string getHostname();
 
     Logger() = default;
-
-    ~Logger() = default;
 };
 
 #endif //CHRONOLOG_LOG_H
