@@ -71,7 +71,7 @@ int main(int argc, char**argv)
     {
         std::exit(EXIT_FAILURE);
     }
-    ChronoLog::ConfigurationManager confManager(conf_file_path);
+    chronolog::ConfigurationManager confManager(conf_file_path);
     int result = Logger::initialize(confManager.KEEPER_CONF.KEEPER_LOG_CONF.LOGTYPE
                                     , confManager.KEEPER_CONF.KEEPER_LOG_CONF.LOGFILE
                                     , confManager.KEEPER_CONF.KEEPER_LOG_CONF.LOGLEVEL

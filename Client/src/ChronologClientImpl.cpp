@@ -11,7 +11,7 @@ chronolog::ChronologClientImpl*chronolog::ChronologClientImpl::chronologClientIm
 
 
 chronolog::ChronologClientImpl*
-chronolog::ChronologClientImpl::GetClientImplInstance(ChronoLog::ConfigurationManager const &confManager)
+chronolog::ChronologClientImpl::GetClientImplInstance(chronolog::ConfigurationManager const &confManager)
 {
     std::lock_guard <std::mutex> lock_client(chronologClientMutex);
     if(chronologClientImplInstance == nullptr)
@@ -23,7 +23,7 @@ chronolog::ChronologClientImpl::GetClientImplInstance(ChronoLog::ConfigurationMa
 }
 
 ////////
-chronolog::ChronologClientImpl::ChronologClientImpl(const ChronoLog::ConfigurationManager &confManager): clientState(
+chronolog::ChronologClientImpl::ChronologClientImpl(const chronolog::ConfigurationManager &confManager): clientState(
         UNKNOWN), clientLogin(""), hostId(0), pid(0), clientId(0), tlEngine(nullptr), rpcVisorClient(nullptr)
                                                                                                          , storyteller(
                 nullptr)

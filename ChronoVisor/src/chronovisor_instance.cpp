@@ -39,7 +39,7 @@ int main(int argc, char**argv)
     {
         std::exit(EXIT_FAILURE);
     }
-    ChronoLog::ConfigurationManager confManager(conf_file_path);
+    chronolog::ConfigurationManager confManager(conf_file_path);
     int result = Logger::initialize(confManager.VISOR_CONF.VISOR_LOG_CONF.LOGTYPE
                                     , confManager.VISOR_CONF.VISOR_LOG_CONF.LOGFILE
                                     , confManager.VISOR_CONF.VISOR_LOG_CONF.LOGLEVEL

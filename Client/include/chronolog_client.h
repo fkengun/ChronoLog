@@ -29,7 +29,7 @@ class ChronologClientImpl;
 class Client
 {
 public:
-    Client(ChronoLog::ConfigurationManager const &);
+    Client(chronolog::ConfigurationManager const &);
 
     ~Client();
 

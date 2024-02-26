@@ -32,7 +32,7 @@ public:
     static std::mutex chronologClientMutex;
     static ChronologClientImpl*chronologClientImplInstance;
 
-    static ChronologClientImpl*GetClientImplInstance(ChronoLog::ConfigurationManager const &);
+    static ChronologClientImpl*GetClientImplInstance(chronolog::ConfigurationManager const &);
 
     // the classs is non-copyable
     ChronologClientImpl(ChronologClientImpl const &) = delete;
@@ -79,7 +79,7 @@ private:
     StorytellerClient*storyteller;
     // ClocksourceManager *pClocksourceManager_;
 
-    ChronologClientImpl(const ChronoLog::ConfigurationManager &conf_manager);
+    ChronologClientImpl(const chronolog::ConfigurationManager &conf_manager);
 
     ChronologClientImpl(std::string const &protocol, const std::string &visor_ip, int visor_port
                         , uint16_t service_provider);

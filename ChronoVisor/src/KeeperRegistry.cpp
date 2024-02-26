@@ -15,7 +15,7 @@ namespace chl = chronolog;
 namespace chronolog
 {
 
-int KeeperRegistry::InitializeRegistryService(ChronoLog::ConfigurationManager const &confManager)
+int KeeperRegistry::InitializeRegistryService(chronolog::ConfigurationManager const &confManager)
 {
     int status = chronolog::CL_ERR_UNKNOWN;
     std::lock_guard <std::mutex> lock(registryLock);

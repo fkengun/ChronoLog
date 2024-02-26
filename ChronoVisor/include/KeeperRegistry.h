@@ -80,7 +80,7 @@ public:
     bool is_shutting_down() const
     { return (SHUTTING_DOWN == registryState); }
 
-    int InitializeRegistryService(ChronoLog::ConfigurationManager const &);
+    int InitializeRegistryService(chronolog::ConfigurationManager const &);
 
     int ShutdownRegistryService();
 
