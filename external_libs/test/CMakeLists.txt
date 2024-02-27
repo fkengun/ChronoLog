@@ -1,2 +1,1 @@
 add_subdirectory(cereal)
-add_subdirectory(rocksdb)
