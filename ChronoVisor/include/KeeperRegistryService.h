@@ -2,7 +2,6 @@
 #define KEEPER_REGISTRY_SERVICE_H
 
 #include <iostream>
-//#include <margo.h>
 #include <thallium.hpp>
 #include <thallium/serialization/stl/string.hpp>
 

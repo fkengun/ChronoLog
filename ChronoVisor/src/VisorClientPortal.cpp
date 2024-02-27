@@ -9,8 +9,6 @@
 #include "VisorClientPortal.h"
 
 #include "KeeperRegistry.h"
-#include "ClientRegistryManager.h"
-#include "ChronicleMetaDirectory.h"
 #include "ClientPortalService.h"
 
 namespace tl = thallium;
