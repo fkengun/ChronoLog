@@ -8,6 +8,7 @@ message("Building CMAKE_CURRENT_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_executable(chrono_keeper)
 target_include_directories(chrono_keeper PRIVATE include
+    ./include
     ../chrono_common
     ../ChronoAPI/ChronoLog/include)
 

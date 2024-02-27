@@ -10,13 +10,10 @@ namespace chronolog
 
 class KeeperStatsMsg
 {
-
     KeeperIdCard keeperIdCard;
     uint32_t active_story_count;
 
 public:
-
-
     KeeperStatsMsg(KeeperIdCard const &keeper_card = KeeperIdCard{0, 0, 0}, uint32_t count = 0): keeperIdCard(
             keeper_card), active_story_count(count)
     {}
