@@ -34,7 +34,7 @@ Created by Aparna on 01/12/2023
 #include <iostream>
 #include <sys/wait.h>
 #include <unistd.h>
-#include "parse_commands.h"
+#include "deprec.parse_commands.h"
 #include "log.h"
 
 int max_msg_len;

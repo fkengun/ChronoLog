@@ -1,4 +1,4 @@
-add_executable(timestamp_test timestamp_test.cpp)
+add_executable(timestamp_test deprec.timestamp_test.cpp)
 target_include_directories(timestamp_test PRIVATE ${ChronoVisor_SOURCE_DIR}/include)
 target_link_libraries(timestamp_test ChronoVisor_lib socketpp)
 add_dependencies(timestamp_test ChronoVisor_lib socketpp)

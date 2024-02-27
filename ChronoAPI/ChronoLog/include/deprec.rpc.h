@@ -26,7 +26,7 @@
 #include <thallium/serialization/stl/unordered_set.hpp>
 #include <thallium/serialization/stl/vector.hpp>
 #include <future>
-#include <macro.h>
+#include <deprec.macro.h>
 #include <log.h>
 
 #include <netdb.h>
@@ -224,6 +224,6 @@ public:
 
 };
 
-#include "rpc.cpp"
+#include "deprec.rpc.cpp"
 
 #endif //CHRONOLOG_RPC_H

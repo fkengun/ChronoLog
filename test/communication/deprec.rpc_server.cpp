@@ -2,9 +2,9 @@
 // Created by kfeng on 3/30/22.
 //
 
-#include <rpc.h>
+#include <deprec.rpc.h>
 #include <ClientRegistryManager.h>
-#include "RPCVisor.h"
+#include "deprec.RPCVisor.h"
 #include "global_var_visor.h"
 
 int main()

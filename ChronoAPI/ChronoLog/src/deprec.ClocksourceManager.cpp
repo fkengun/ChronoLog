@@ -2,7 +2,7 @@
 // Created by kfeng on 2/8/22.
 //
 
-#include "ClocksourceManager.h"
+#include "deprec.ClocksourceManager.h"
 
 ClocksourceManager*ClocksourceManager::clocksourceManager_ = nullptr;
 

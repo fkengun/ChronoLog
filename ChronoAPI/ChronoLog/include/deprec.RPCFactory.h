@@ -7,7 +7,7 @@
 
 #include <unordered_map>
 #include <memory>
-#include "rpc.h"
+#include "deprec.rpc.h"
 
 class ChronoLogRPCFactory
 {

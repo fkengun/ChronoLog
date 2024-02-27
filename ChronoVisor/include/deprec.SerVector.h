@@ -6,7 +6,7 @@
 #define CHRONOLOG__SERVECTOR_H_
 
 #include <vector>
-#include "TimeRecord.h"
+#include "deprec.TimeRecord.h"
 #include <cereal/types/vector.hpp>
 #include <cereal/archives/binary.hpp>
 

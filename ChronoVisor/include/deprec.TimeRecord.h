@@ -9,7 +9,7 @@
 #include <iomanip>
 #include <sstream>
 #include <cassert>
-#include "ClocksourceManager.h"
+#include "deprec.ClocksourceManager.h"
 
 /**
  * Class of each record in TimeDB, which might not be the same as TimeInfo in message serde

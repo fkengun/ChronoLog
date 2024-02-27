@@ -12,8 +12,8 @@
 #include <Socket.h>
 #include <type.h>
 #include <log.h>
-#include "TimeManager.h"
-#include <TimeRecord.h>
+#include "deprec.TimeManager.h"
+#include <deprec.TimeRecord.h>
 #include <ClientRegistryInfo.h>
 #include <SerDe.h>
 #include <ChronicleMetaDirectory.h>

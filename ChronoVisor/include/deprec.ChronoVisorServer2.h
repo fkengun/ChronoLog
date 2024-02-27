@@ -11,7 +11,7 @@
 //#include <ClocksourceManager.h>
 //#include <ChronicleMetaDirectory.h>
 //#include <ClientRegistryManager.h>
-#include <RPCVisor.h>
+#include <deprec.RPCVisor.h>
 
 class ClocksourceManager;
 

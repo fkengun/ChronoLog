@@ -11,9 +11,9 @@
 #include <thallium.hpp>
 #include <sys/types.h>
 #include <unistd.h>
-#include "macro.h"
+#include "deprec.macro.h"
 #include "chronolog_errcode.h"
-#include "RPCFactory.h"
+#include "deprec.RPCFactory.h"
 #include "ClientRegistryManager.h"
 #include "ChronicleMetaDirectory.h"
 #include "KeeperRegistry.h"

@@ -12,8 +12,8 @@
 #include <utility>
 #include <sys/types.h>
 #include <unistd.h>
-#include "macro.h"
-#include "RPCFactory.h"
+#include "deprec.macro.h"
+#include "deprec.RPCFactory.h"
 
 #include "AcquireStoryResponseMsg.h"
 

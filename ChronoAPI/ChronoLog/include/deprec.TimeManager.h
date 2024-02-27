@@ -6,7 +6,7 @@
 #define CHRONOLOG_TIMEMANAGER_H
 
 #include <atomic>
-#include "ClocksourceManager.h"
+#include "deprec.ClocksourceManager.h"
 #include "TimeRecord.h"
 
 #define TIME_DB_INIT_WAIT 1
