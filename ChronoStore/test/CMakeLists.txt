@@ -16,6 +16,7 @@ add_executable(hdf5_archiver_test
 
 target_include_directories(hdf5_archiver_test PRIVATE ../../ChronoKeeper
     ../../chrono_common
+    ../../ChronoKeeper/include
     ./)
 target_link_libraries(hdf5_archiver_test ${HDF5_LIBRARIES})
 target_link_libraries(hdf5_archiver_test json-c)
